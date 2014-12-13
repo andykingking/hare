@@ -5,8 +5,8 @@ import (
 )
 
 type Key struct {
-	Digest uint64
-	Index  uint64
+	Digest uint64 `capid:"0"`
+	Index  uint64 `capid:"1"`
 }
 
 func NewKey(index uint64) *Key {
