@@ -73,7 +73,7 @@ func (server *Server) handleConnection(conn net.Conn) {
   if err != nil {
     res.Err = err.Error()
   } else {
-    // res = server.HandleCommand(cmd)
+    res = server.HandleCommand(cmd)
   }
 
   jsonRes, err = json.Marshal(&res)
