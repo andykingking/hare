@@ -1,16 +1,19 @@
 hare
 ====
 
+- [ ] Bugs
+  - [ ] Sequencer index isn't being serialized
+
 - [ ] MapReduce
- -  [ ] Javascript runtime
- -  [ ] B+Tree map-reduce index
- -  [ ] LRU index vacuum
- -  [ ] Streaming index updates
+  - [ ] Javascript runtime
+  - [ ] MapReduce cache
+  - [ ] LRU cache index
 
 - [ ] Database
- -  [ ] BoltDB
+  - [x] BoltDB
 
 - [ ] Interface
- -  [ ] Memcache
- -  [ ] Ruby
- -  [ ] HTTP
+  - [x] JSON
+  - [ ] Memcache
+  - [ ] Ruby
+  - [ ] HTTP
