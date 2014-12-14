@@ -21,5 +21,8 @@ func main() {
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 	log.Println(<-ch)
 
-	hare.Stop()
+	err = hare.Stop()
+	if err != nil {
+		log.Println(err)
+	}
 }
