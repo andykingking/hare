@@ -1,89 +1,108 @@
 package hare
 
 import (
-  "net"
-  "fmt"
-  "bufio"
-  "encoding/json"
+	"bufio"
+	"encoding/json"
+	"log"
+	"net"
+	"sync"
+	"time"
 )
 
 type Server struct {
-  addr        string
-  listener    net.Listener
-  running     bool
-  db          DB
+	db *DB
+
+	net.TCPAddr
+	listener  *net.TCPListener
+	signal    chan bool
+	waitGroup *sync.WaitGroup
 }
 
 type Command struct {
-  Name        string
-  Args        map[string]string
+	Name string
+	Args map[string]string
 }
 
 type Result struct {
-  Err         string
-  Val         interface{}
+	Err error
+	Val interface{}
 }
 
-func (server *Server) Start() error {
+func (server *Server) Start() (err error) {
+	server.waitGroup = &sync.WaitGroup{}
+	server.signal = make(chan bool)
+	server.listener, err = net.ListenTCP("tcp4", &server.TCPAddr)
+	if err != nil {
+		return err
+	}
 
-  listener, err := net.Listen("tcp", server.addr)
-  if err != nil {
-    return err
-  }
+	go server.run()
 
-  server.listener = listener
-  go server.run()
-
-  return nil
+	return nil
 }
 
-func (server *Server) Stop() error {
-  server.running = false
-  err := server.listener.Close()
-  return err
+func (server *Server) Stop() {
+	close(server.signal) // sends zero-valued signal
+	server.waitGroup.Wait()
 }
 
 func (server *Server) run() {
-  server.running = true
+	server.waitGroup.Add(1)
+	defer server.waitGroup.Done()
 
-  var err error
-  for server.running {
-    var conn net.Conn
-    conn, err = server.listener.Accept()
-    if err != nil {
-      fmt.Println(err) // TODO handle error
-      continue
-    }
-    go server.handleConnection(conn)
-  }
+	var err error
+	for {
+		select {
+		case <-server.signal:
+			log.Println("Closing listener")
+			server.listener.Close()
+			return
+		default:
+		}
+
+		server.listener.SetDeadline(time.Now().Add(1e9))
+		var conn *net.TCPConn
+		conn, err = server.listener.AcceptTCP()
+		if err != nil {
+			if opErr, ok := err.(*net.OpError); ok && opErr.Timeout() {
+				continue
+			}
+			log.Println(err)
+		}
+
+		log.Println(conn.RemoteAddr(), "connected")
+		server.waitGroup.Add(1)
+		go server.handleConnection(conn)
+	}
 }
 
-func (server *Server) handleConnection(conn net.Conn) {
-  defer conn.Close()
+func (server *Server) handleConnection(conn *net.TCPConn) {
+	defer conn.Close()
+	defer server.waitGroup.Done()
 
-  var err error
-  var cmd = &Command{}
-  var res = &Result{}
-  var jsonRes []byte
-  reader := bufio.NewReader(conn)
-  writer := bufio.NewWriter(conn)
-  jsonIn := json.NewDecoder(reader)
+	var err error
+	var cmd = &Command{}
+	var res = &Result{}
+	var jsonRes []byte
+	reader := bufio.NewReader(conn)
+	writer := bufio.NewWriter(conn)
+	jsonIn := json.NewDecoder(reader)
 
-  err = jsonIn.Decode(&cmd)
-  if err != nil {
-    res.Err = err.Error()
-  } else {
-    res = server.HandleCommand(cmd)
-  }
+	err = jsonIn.Decode(&cmd)
+	if err != nil {
+		res.Err = err
+	} else {
+		res = server.HandleCommand(cmd)
+	}
 
-  jsonRes, err = json.Marshal(&res)
-  if err != nil {
-    fmt.Println(err)
-    return
-  }
+	jsonRes, err = json.Marshal(&res)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
-  fmt.Println(string(jsonRes))
+	log.Println(jsonRes)
 
-  writer.Write(jsonRes)
-  writer.Flush()
+	writer.Write(jsonRes)
+	writer.Flush()
 }

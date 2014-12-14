@@ -1,32 +1,35 @@
 package hare
 
 import (
-	"github.com/spaolacci/murmur3"
+	"encoding/binary"
+	"io"
 )
 
 type Key struct {
-	Digest uint64 `capid:"0"`
-	Index  uint64 `capid:"1"`
+	Id    uint64 `capid:"0"`
+	saved bool
 }
 
-func NewKey(index uint64) *Key {
-	var key = &Key{Index: index}
-	var h64 = murmur3.New64()
-	h64.Write(uint64Bytes(key.Index))
-	key.Digest = h64.Sum64()
-	return key
+type Keyed interface {
+	IdBytes() []byte
+
+	Load(r io.Reader)
+	Save(w io.Writer)
+
+	SetSaved(saved bool)
 }
 
-func uint64Bytes(v uint64) []byte {
-	// little-endian encode uint64
-	var b = make([]byte, 8)
-	b[0] = byte(v)
-	b[1] = byte(v >> 8)
-	b[2] = byte(v >> 16)
-	b[3] = byte(v >> 24)
-	b[4] = byte(v >> 32)
-	b[5] = byte(v >> 40)
-	b[6] = byte(v >> 48)
-	b[7] = byte(v >> 56)
+func (key *Key) IdBytes() []byte {
+	b := make([]byte, 8)
+	binary.LittleEndian.PutUint64(b, key.Id)
 	return b
+}
+
+func (key *Key) SetSaved(saved bool) {
+	key.saved = saved
+}
+
+func (key *Key) SetId(sId string) uint64 {
+	key.Id = binary.LittleEndian.Uint64([]byte(sId))
+	return key.Id
 }

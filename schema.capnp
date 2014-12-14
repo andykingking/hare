@@ -1,12 +1,11 @@
-@0xbec2cc1e5e0ac136;
+@0xf4e89d71282c618d;
 using Go = import "go.capnp";
 $Go.package("hare");
 $Go.import("testpkg");
 
 
 struct KeyCapn { 
-   digest  @0:   UInt64; 
-   index   @1:   UInt64; 
+   id  @0:   UInt64; 
 } 
 
 ##compile with:

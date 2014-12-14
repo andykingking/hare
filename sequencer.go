@@ -1,10 +1,11 @@
 package hare
 
 type Sequencer struct {
-  index   uint64
+	Index uint64
+	Key
 }
 
-func (seq *Sequencer) Next() *Key {
-  seq.index++
-  return NewKey(seq.index)
+func (seq *Sequencer) Next() uint64 {
+	seq.Index++
+	return seq.Index
 }

@@ -1,55 +1,55 @@
 package hare
 
 import (
-  "fmt"
+	"log"
+	"net"
 )
 
 type Hare struct {
-  db        DB
-  server    Server
+	db     DB
+	server Server
 }
 
-func (hare *Hare) Start() error {
+func (hare *Hare) Start() (err error) {
+	log.Println("Starting Hare")
 
-  var err error
+	path := "hare.db"
+	log.Println("Opening database", path)
+	hare.db = DB{path: path}
+	err = hare.db.Open()
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 
-  path := "hare.db"
-  fmt.Printf("Opening database %s\n", path)
-  hare.db = DB{path: path}
-  err = hare.db.Open()
-  if err != nil {
-    fmt.Println(err)
-    return err
-  }
-  fmt.Printf("Sequence %v\n", hare.db.seq.index)
+	var laddr *net.TCPAddr
+	laddr, err = net.ResolveTCPAddr("tcp", "127.0.0.1:4888")
+	if err != nil {
+		return err
+	}
+	log.Println("Starting server on", laddr)
+	hare.server = Server{db: &hare.db, TCPAddr: *laddr}
+	err = hare.server.Start()
+	if err != nil {
+		return err
+	}
 
-  addr := "127.0.0.1:4888"
-  fmt.Printf("Starting server on %s\n", addr)
-  hare.server = Server{addr: addr, db: hare.db}
-  err = hare.server.Start()
-  if err != nil {
-    fmt.Println(err)
-    return err
-  }
-
-  return nil
+	return nil
 }
 
-func (hare *Hare) Stop() {
+func (hare *Hare) Stop() (err error) {
+	log.Println("Stopping Hare")
 
-  var err error
+	log.Println("Stopping server")
+	hare.server.Stop()
+	log.Println("Server stopped")
 
-  fmt.Println("Stopping server")
-  err = hare.server.Stop()
-  if err != nil {
-    fmt.Println(err)
-  }
+	log.Println("Closing database at", hare.db.Index)
+	err = hare.db.Close()
+	if err != nil {
+		return err
+	}
+	log.Println("Database closed")
 
-  fmt.Println("Closing database")
-  fmt.Printf("Sequence %v\n", hare.db.seq.index)
-  err = hare.db.Close()
-  if err != nil {
-    fmt.Println(err)
-  }
-
+	return nil
 }

@@ -1,61 +1,77 @@
 package hare
 
 import (
-  "encoding/binary"
-  "github.com/boltdb/bolt"
+	"bytes"
+	"errors"
+	"github.com/boltdb/bolt"
+	"log"
 )
 
 type DB struct {
-  path    string
-  opened  bool
+	path string
 
-  bolt    *bolt.DB
-  seq     *Sequencer
+	Sequencer
+	bolt *bolt.DB
 }
 
 func (db *DB) Open() error {
-  var err error
-  db.bolt, err = bolt.Open(db.path, 0600, nil)
-  if err != nil {
-    return err
-  }
-  db.opened = true
+	var err error
+	db.bolt, err = bolt.Open(db.path, 0600, nil)
+	if err != nil {
+		return err
+	}
 
-  db.seq = &Sequencer{index: db.loadSequenceIndex()}
+	db.Sequencer.Key.Id = 0
+	db.Sequencer.Index = 65535
+	db.Load(&db.Sequencer)
+	log.Println("Sequencer", db.Sequencer)
 
-  return nil
+	return nil
 }
 
-func (db *DB) Close() error {
-  db.opened = false
-  db.saveSequenceIndex(db.seq.index)
-  return db.bolt.Close()
+func (db *DB) Close() (err error) {
+	err = db.Save(&db.Sequencer)
+	return err
 }
 
-func (db *DB) loadSequenceIndex() uint64 {
-  var seqIndex uint64
-
-  db.bolt.Update(func(tx *bolt.Tx) error {
-    bucket, _ := tx.CreateBucketIfNotExists([]byte("seq"))
-    bSeqIndex := bucket.Get([]byte("seqindex"))
-    if bSeqIndex == nil {
-      seqIndex = 0
-    } else {
-      seqIndex  = binary.LittleEndian.Uint64(bSeqIndex[0:8])
-    }
-
-    return nil
-  })
-
-  return seqIndex
+func (db *DB) NewKey() *Key {
+	return &Key{Id: db.Next()}
 }
 
-func (db *DB) saveSequenceIndex(seqIndex uint64) {
-  db.bolt.Update(func(tx *bolt.Tx) error {
-    bucket, _ := tx.CreateBucketIfNotExists([]byte("seq"))
-    bSeqIndex := make([]byte, 8); binary.LittleEndian.PutUint64(bSeqIndex, seqIndex)
-    bucket.Put([]byte("seqindex"), bSeqIndex)
+func (db *DB) Load(obj Keyed) (err error) {
+	log.Println("Loading", obj.IdBytes())
+	err = db.bolt.Update(func(tx *bolt.Tx) error {
+		bucket, _ := tx.CreateBucketIfNotExists([]byte("hare"))
+		bObj := bucket.Get(obj.IdBytes())
+		if bObj == nil {
+			return errors.New("Object not found")
+		} else {
+			obj.Load(bytes.NewReader(bObj))
+			obj.SetSaved(true)
+		}
+		return nil
+	})
+	return err
+}
 
-    return nil
-  })
+func (db *DB) Save(obj Keyed) (err error) {
+	log.Println("Saving", obj.IdBytes())
+	err = db.bolt.Update(func(tx *bolt.Tx) error {
+		bucket, _ := tx.CreateBucketIfNotExists([]byte("hare"))
+		var bObj bytes.Buffer
+		obj.Save(&bObj)
+		bucket.Put(obj.IdBytes(), bObj.Bytes())
+		obj.SetSaved(true)
+		return nil
+	})
+	return err
+}
+
+func (db *DB) Delete(obj Keyed) (err error) {
+	log.Println("Deleting", obj.IdBytes())
+	err = db.bolt.Update(func(tx *bolt.Tx) error {
+		bucket, _ := tx.CreateBucketIfNotExists([]byte("hare"))
+		return bucket.Delete(obj.IdBytes())
+	})
+	return err
 }
