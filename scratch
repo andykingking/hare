@@ -1,0 +1,8 @@
+scratch
+
+{ "name": "GET", "args": { "id": "1" } }
+{ "name": "SET", "args": { "body": "{\"type\":\"Turtle\"}" } }
+{ "name": "SET", "args": { "id": "1", "body": "{\"type\":\"Turtle\"}" } }
+
+{ "name": "VGET", "args": { "name": "simple" } }
+{ "name": "VSET", "args": { "name": "simple", "src": "function(doc) { emit(doc._id, doc); }" } }

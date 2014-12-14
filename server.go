@@ -19,13 +19,13 @@ type Server struct {
 }
 
 type Command struct {
-	Name string
-	Args map[string]string
+	Name string            `json:"name"`
+	Args map[string]string `json:"args"`
 }
 
 type Result struct {
-	Err error
-	Val interface{}
+	Err string      `json:"err"`
+	Val interface{} `json:"val"`
 }
 
 func (server *Server) Start() (err error) {
@@ -90,18 +90,19 @@ func (server *Server) handleConnection(conn *net.TCPConn) {
 
 	err = jsonIn.Decode(&cmd)
 	if err != nil {
-		res.Err = err
+		res.Err = err.Error()
 	} else {
+		log.Println("<--", cmd)
 		res = server.HandleCommand(cmd)
 	}
 
-	jsonRes, err = json.Marshal(&res)
+	jsonRes, err = json.Marshal(res)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	log.Println(jsonRes)
+	log.Println("-->", string(jsonRes))
 
 	writer.Write(jsonRes)
 	writer.Flush()

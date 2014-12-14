@@ -1,8 +1,24 @@
 package hare
 
+import (
+	"errors"
+)
+
 type Sequencer struct {
-	Index uint64
-	Key
+	Record `capid:"skip"`
+	Index  uint64 `capid:"0"`
+}
+
+func (seq *Sequencer) BucketName() string {
+	return "seq"
+}
+
+func (seq *Sequencer) Key() []byte {
+	return []byte{0, 0, 0, 0, 0, 0, 0, 1}
+}
+
+func (seq *Sequencer) SetKey(sId string) error {
+	return errors.New("Can't set key for sequence")
 }
 
 func (seq *Sequencer) Next() uint64 {
