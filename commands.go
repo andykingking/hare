@@ -4,12 +4,13 @@ import (
 	"errors"
 )
 
-func (server *Server) HandleCommand(cmd *Command) *Result {
-
+func (server *Server) HandleCommand(cmd *Command) (res *Result) {
 	switch cmd.Name {
 	default:
-		return server.unknown()
+		res = server.unknown()
 	}
+	return res
+}
 
 }
 
