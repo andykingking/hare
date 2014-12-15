@@ -109,7 +109,11 @@ func (server *Server) vget(cmd *Command) *Result {
 	}
 
 	var view *View = &View{}
-	view.SetKey(name)
+	err = view.SetKey(name)
+	if err != nil {
+		res.Err = err.Error()
+		return res
+	}
 	err = server.db.Load(view)
 	if err != nil {
 		res.Err = err.Error()
@@ -138,7 +142,11 @@ func (server *Server) vset(cmd *Command) *Result {
 	}
 
 	var view = &View{Src: src}
-	view.SetKey(name)
+	err = view.SetKey(name)
+	if err != nil {
+		res.Err = err.Error()
+		return res
+	}
 
 	err = server.db.Save(view)
 	if err != nil {
