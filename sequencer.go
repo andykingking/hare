@@ -6,7 +6,7 @@ import (
 
 type Sequencer struct {
 	Record `capid:"skip"`
-	Index  Key `capid:"0"`
+	Mark   uint64 `capid:"0"`
 }
 
 func (seq *Sequencer) BucketName() string {
@@ -21,7 +21,7 @@ func (seq *Sequencer) SetKey(sId string) error {
 	return errors.New("Can't set key for sequence")
 }
 
-func (seq *Sequencer) NextKey() Key {
-	seq.Index.kInt++
-	return seq.Index
+func (seq *Sequencer) NextKey() uint64 {
+	seq.Mark++
+	return seq.Mark
 }

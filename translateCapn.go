@@ -48,43 +48,6 @@ func DocumentGoToCapn(seg *capn.Segment, src *Document) DocumentCapn {
 
 
 
-func (s *Key) Save(w io.Writer) {
-  	seg := capn.NewBuffer(nil)
-  	KeyGoToCapn(seg, s)
-  	seg.WriteTo(w)
-}
- 
-
- 
-func (s *Key) Load(r io.Reader) {
-  	capMsg, err := capn.ReadFromStream(r, nil)
-  	if err != nil {
-  		panic(fmt.Errorf("capn.ReadFromStream error: %s", err))
-  	}
-  	z := ReadRootKeyCapn(capMsg)
-      KeyCapnToGo(z, s)
-}
-
-
-
-func KeyCapnToGo(src KeyCapn, dest *Key) *Key { 
-  if dest == nil { 
-    dest = &Key{} 
-  }
-
-  return dest
-} 
-
-
-
-func KeyGoToCapn(seg *capn.Segment, src *Key) KeyCapn { 
-  dest := AutoNewKeyCapn(seg)
-
-  return dest
-} 
-
-
-
 func (s *Sequencer) Save(w io.Writer) {
   	seg := capn.NewBuffer(nil)
   	SequencerGoToCapn(seg, s)
@@ -108,6 +71,7 @@ func SequencerCapnToGo(src SequencerCapn, dest *Sequencer) *Sequencer {
   if dest == nil { 
     dest = &Sequencer{} 
   }
+  dest.Mark = uint64(src.Mark())
 
   return dest
 } 
@@ -116,6 +80,7 @@ func SequencerCapnToGo(src SequencerCapn, dest *Sequencer) *Sequencer {
 
 func SequencerGoToCapn(seg *capn.Segment, src *Sequencer) SequencerCapn { 
   dest := AutoNewSequencerCapn(seg)
+  dest.SetMark(uint64(src.Mark))
 
   return dest
 } 

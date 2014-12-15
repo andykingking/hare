@@ -18,7 +18,7 @@ type Recorded interface {
 }
 
 type Record struct {
-	K     Key `capid:"skip", json:"key"`
+	K     uint64 `capid:"skip", json:"key"`
 	saved bool
 }
 
@@ -27,7 +27,7 @@ func (record *Record) BucketName() string {
 }
 
 func (record *Record) Key() []byte {
-	return record.K.Bytes()
+	return KeyToBytes(record.K)
 }
 
 func (record *Record) SetKey(key string) error {

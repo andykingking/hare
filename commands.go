@@ -24,7 +24,7 @@ func (server *Server) HandleCommand(cmd *Command) (res *Result) {
 
 // { "name": "SEQ", "args": {} }
 func (server *Server) seq(cmd *Command) *Result {
-	return &Result{Val: server.db.Sequencer.Index}
+	return &Result{Val: server.db.Sequencer.Mark}
 }
 
 // { "name": "GET", "args": { "id", id } }

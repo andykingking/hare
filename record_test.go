@@ -19,9 +19,9 @@ var _ = Describe("Record", func() {
 
 	Describe("Key()", func() {
 		It("is the keys bytes", func() {
-			key := NewKey(12345678)
+			var key uint64 = 12345678
 			record.K = key
-			Expect(record.Key()).To(Equal(key.Bytes()))
+			Expect(record.Key()).To(Equal(KeyToBytes(key)))
 		})
 	})
 

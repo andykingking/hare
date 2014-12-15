@@ -44,7 +44,7 @@ func (hare *Hare) Stop() (err error) {
 	hare.server.Stop()
 	log.Println("Server stopped")
 
-	log.Println("Closing database at", hare.db.Index)
+	log.Println("Closing database at", hare.db.Mark)
 	err = hare.db.Close()
 	if err != nil {
 		return err
