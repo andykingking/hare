@@ -2,7 +2,7 @@ hare
 ====
 
 - [ ] Bugs
-  - [ ] Sequencer index isn't being serialized
+  - [x] Sequencer index isn't being serialized
 
 - [ ] MapReduce
   - [ ] Javascript runtime
@@ -11,6 +11,8 @@ hare
 
 - [ ] Database
   - [x] BoltDB
+  - [ ] Docs
+  - [ ] Facts
 
 - [ ] Interface
   - [x] JSON
