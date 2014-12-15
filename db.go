@@ -46,7 +46,7 @@ func (db *DB) Load(obj Recorded) (err error) {
 			return errors.New("Object not found")
 		} else {
 			obj.Load(bytes.NewReader(bObj))
-			log.Println("LOAD", bucketName, bKey, bObj)
+			// log.Println("LOAD", bucketName, bKey, bObj)
 			obj.SetSaved(true)
 		}
 		return nil
@@ -71,7 +71,7 @@ func (db *DB) Save(obj Recorded) (err error) {
 		if err != nil {
 			return err
 		}
-		log.Println("SAVE", bucketName, bKey, bObj)
+		// log.Println("SAVE", bucketName, bKey, bObj)
 		obj.SetSaved(true)
 		return nil
 	})
@@ -86,7 +86,7 @@ func (db *DB) Delete(obj Recorded) (err error) {
 		if err != nil {
 			return err
 		}
-		log.Println("DELETE", bucketName, bKey)
+		// log.Println("DELETE", bucketName, bKey)
 		return bucket.Delete(bKey)
 	})
 	return err
