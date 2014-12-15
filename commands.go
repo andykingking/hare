@@ -2,10 +2,13 @@ package hare
 
 import (
 	"log"
+	"time"
 )
 
 func (server *Server) HandleCommand(cmd *Command) (res *Result) {
 	switch cmd.Name {
+	case "TIME":
+		res = server.time(cmd)
 	case "SEQ":
 		res = server.seq(cmd)
 	case "GET":
@@ -19,6 +22,14 @@ func (server *Server) HandleCommand(cmd *Command) (res *Result) {
 	default:
 		res = server.unknown()
 	}
+	return res
+}
+
+// { "name": "TIME" }
+func (server *Server) time(cmd *Command) *Result {
+	var res *Result = &Result{}
+	t := time.Now()
+	res.Val = t
 	return res
 }
 
