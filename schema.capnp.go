@@ -39,8 +39,8 @@ func NewSequencerCapn(s *C.Segment) SequencerCapn      { return SequencerCapn(s.
 func NewRootSequencerCapn(s *C.Segment) SequencerCapn  { return SequencerCapn(s.NewRootStruct(8, 0)) }
 func AutoNewSequencerCapn(s *C.Segment) SequencerCapn  { return SequencerCapn(s.NewStructAR(8, 0)) }
 func ReadRootSequencerCapn(s *C.Segment) SequencerCapn { return SequencerCapn(s.Root(0).ToStruct()) }
-func (s SequencerCapn) Index() uint64                  { return C.Struct(s).Get64(0) }
-func (s SequencerCapn) SetIndex(v uint64)              { C.Struct(s).Set64(0, v) }
+func (s SequencerCapn) Index() int64                   { return int64(C.Struct(s).Get64(0)) }
+func (s SequencerCapn) SetIndex(v int64)               { C.Struct(s).Set64(0, uint64(v)) }
 
 // capn.JSON_enabled == false so we stub MarshallJSON().
 func (s SequencerCapn) MarshalJSON() (bs []byte, err error) { return }

@@ -71,6 +71,7 @@ func SequencerCapnToGo(src SequencerCapn, dest *Sequencer) *Sequencer {
   if dest == nil { 
     dest = &Sequencer{} 
   }
+  dest.Index = int64(src.Index())
 
   return dest
 } 
@@ -79,6 +80,7 @@ func SequencerCapnToGo(src SequencerCapn, dest *Sequencer) *Sequencer {
 
 func SequencerGoToCapn(seg *capn.Segment, src *Sequencer) SequencerCapn { 
   dest := AutoNewSequencerCapn(seg)
+  dest.SetIndex(src.Index)
 
   return dest
 } 

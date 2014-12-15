@@ -1,4 +1,4 @@
-@0xa1291fe5eb2b2264;
+@0xb02ecbace7fc98f6;
 using Go = import "go.capnp";
 $Go.package("hare");
 $Go.import("testpkg");
@@ -9,7 +9,7 @@ struct DocumentCapn {
 } 
 
 struct SequencerCapn { 
-   index  @0:   UInt64; 
+   index  @0:   Int64; 
 } 
 
 struct ViewCapn { 
