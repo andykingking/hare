@@ -39,8 +39,8 @@ func NewKeyCapn(s *C.Segment) KeyCapn      { return KeyCapn(s.NewStruct(8, 0)) }
 func NewRootKeyCapn(s *C.Segment) KeyCapn  { return KeyCapn(s.NewRootStruct(8, 0)) }
 func AutoNewKeyCapn(s *C.Segment) KeyCapn  { return KeyCapn(s.NewStructAR(8, 0)) }
 func ReadRootKeyCapn(s *C.Segment) KeyCapn { return KeyCapn(s.Root(0).ToStruct()) }
-func (s KeyCapn) Uint64() uint64           { return C.Struct(s).Get64(0) }
-func (s KeyCapn) SetUint64(v uint64)       { C.Struct(s).Set64(0, v) }
+func (s KeyCapn) KInt() uint64             { return C.Struct(s).Get64(0) }
+func (s KeyCapn) SetKInt(v uint64)         { C.Struct(s).Set64(0, v) }
 
 // capn.JSON_enabled == false so we stub MarshallJSON().
 func (s KeyCapn) MarshalJSON() (bs []byte, err error) { return }
@@ -57,12 +57,12 @@ func (s KeyCapn_List) Set(i int, item KeyCapn) { C.PointerList(s).Set(i, C.Objec
 
 type SequencerCapn C.Struct
 
-func NewSequencerCapn(s *C.Segment) SequencerCapn      { return SequencerCapn(s.NewStruct(8, 0)) }
-func NewRootSequencerCapn(s *C.Segment) SequencerCapn  { return SequencerCapn(s.NewRootStruct(8, 0)) }
-func AutoNewSequencerCapn(s *C.Segment) SequencerCapn  { return SequencerCapn(s.NewStructAR(8, 0)) }
+func NewSequencerCapn(s *C.Segment) SequencerCapn      { return SequencerCapn(s.NewStruct(0, 1)) }
+func NewRootSequencerCapn(s *C.Segment) SequencerCapn  { return SequencerCapn(s.NewRootStruct(0, 1)) }
+func AutoNewSequencerCapn(s *C.Segment) SequencerCapn  { return SequencerCapn(s.NewStructAR(0, 1)) }
 func ReadRootSequencerCapn(s *C.Segment) SequencerCapn { return SequencerCapn(s.Root(0).ToStruct()) }
-func (s SequencerCapn) Index() int64                   { return int64(C.Struct(s).Get64(0)) }
-func (s SequencerCapn) SetIndex(v int64)               { C.Struct(s).Set64(0, uint64(v)) }
+func (s SequencerCapn) Index() KeyCapn                 { return KeyCapn(C.Struct(s).GetObject(0).ToStruct()) }
+func (s SequencerCapn) SetIndex(v KeyCapn)             { C.Struct(s).SetObject(0, C.Object(v)) }
 
 // capn.JSON_enabled == false so we stub MarshallJSON().
 func (s SequencerCapn) MarshalJSON() (bs []byte, err error) { return }
@@ -70,7 +70,7 @@ func (s SequencerCapn) MarshalJSON() (bs []byte, err error) { return }
 type SequencerCapn_List C.PointerList
 
 func NewSequencerCapnList(s *C.Segment, sz int) SequencerCapn_List {
-	return SequencerCapn_List(s.NewUInt64List(sz))
+	return SequencerCapn_List(s.NewCompositeList(0, 1, sz))
 }
 func (s SequencerCapn_List) Len() int { return C.PointerList(s).Len() }
 func (s SequencerCapn_List) At(i int) SequencerCapn {

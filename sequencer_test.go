@@ -33,18 +33,18 @@ var _ = Describe("Sequencer", func() {
 	})
 
 	Describe("Index", func() {
-		It("has a default value of 0", func() {
-			var e int64 = 0
-			Expect(seq.Index).To(Equal(e))
+		It("has a default key value of 0", func() {
+			Expect(seq.Index).To(Equal(NewKey(0)))
 		})
 	})
 
 	Describe("NextKey()", func() {
 		It("increments and returns Index", func() {
-			seq.Index = 8
-			n := seq.NextKey()
-			Expect(n).To(Equal(NewKey(9)))
-			Expect(seq.Index).To(Equal(int64(9)))
+			seq.Index = NewKey(8)
+			next := NewKey(9)
+			res := seq.NextKey()
+			Expect(res).To(Equal(next))
+			Expect(seq.Index).To(Equal(next))
 		})
 	})
 
@@ -58,7 +58,7 @@ var _ = Describe("Sequencer", func() {
 
 	Describe("serialisation", func() {
 		It("saves and loads to a buffer", func() {
-			seq.Index = 42000
+			seq.Index = NewKey(42000)
 			seqCopy := &Sequencer{}
 
 			var buf bytes.Buffer

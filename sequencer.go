@@ -6,10 +6,7 @@ import (
 
 type Sequencer struct {
 	Record `capid:"skip"`
-
-	// TODO: serialisation of uint64 is broken.
-	// Update cap'n'proto, change to uint64 in future.
-	Index int64 `capid:"0"`
+	Index  Key `capid:"0"`
 }
 
 func (seq *Sequencer) BucketName() string {
@@ -25,6 +22,6 @@ func (seq *Sequencer) SetKey(sId string) error {
 }
 
 func (seq *Sequencer) NextKey() Key {
-	seq.Index++
-	return Key{uint64(seq.Index)}
+	seq.Index.kInt++
+	return seq.Index
 }
