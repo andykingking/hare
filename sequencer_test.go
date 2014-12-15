@@ -1,71 +1,72 @@
-package hare
+package hare_test
 
 import (
+	. "github.com/captainpete/hare"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+
 	"bytes"
-	"fmt"
-	cv "github.com/smartystreets/goconvey/convey"
-	"testing"
 )
 
-func TestSequencerBucketName(t *testing.T) {
-	seq := &Sequencer{}
-	expectedText := "seq"
+var _ = Describe("Sequencer", func() {
 
-	cv.Convey("Given a sequencer", t, func() {
-		cv.Convey(fmt.Sprintf("It should have the BucketName '%s'", expectedText), func() {
-			cv.So(seq.BucketName(), cv.ShouldEqual, expectedText)
+	var (
+		seq *Sequencer
+	)
+
+	BeforeEach(func() {
+		seq = &Sequencer{}
+	})
+
+	Describe("BucketName()", func() {
+		It("should be 'seq'", func() {
+			Expect(seq.BucketName()).To(Equal("seq"))
 		})
 	})
-}
 
-func TestSequencerKey(t *testing.T) {
-	seq := &Sequencer{}
-	expectedKey := []byte{0, 0, 0, 0, 0, 0, 0, 1}
-
-	cv.Convey("Given a sequencer", t, func() {
-		cv.Convey(fmt.Sprintf("It should have the Key '%v'", expectedKey), func() {
-			cv.So(seq.Key(), cv.ShouldResemble, expectedKey)
+	Describe("Key()", func() {
+		It("should be a constant", func() {
+			seqKey := []byte{0, 0, 0, 0, 0, 0, 0, 1}
+			Expect(seq.Key()).To(Equal(seqKey))
 		})
 	})
-}
 
-func TestSequencerNext(t *testing.T) {
-	seq := &Sequencer{}
-
-	cv.Convey("Given a sequencer", t, func() {
-		cv.Convey("It should start with the Index 0", func() {
-			cv.So(seq.Index, cv.ShouldEqual, 0)
-		})
-		cv.Convey("It should increment the Index with Next", func() {
-			for i := 1; i <= 3; i++ {
-				seq.Next()
-				cv.So(seq.Index, cv.ShouldEqual, i)
-			}
+	Describe("Index", func() {
+		It("has a default value of 0", func() {
+			var e int64 = 0
+			Expect(seq.Index).To(Equal(e))
 		})
 	})
-}
 
-func TestSequencerSetKey(t *testing.T) {
-	seq := &Sequencer{}
+	Describe("Next()", func() {
+		It("increments and returns Index", func() {
+			seq.Index = 8
+			n := seq.Next()
+			Expect(n).To(Equal(uint64(9)))
+			Expect(seq.Index).To(Equal(int64(9)))
+		})
+	})
 
-	cv.Convey("Given a sequencer", t, func() {
-		cv.Convey("It should return an error when setting the key", func() {
+	Describe("SetKey()", func() {
+		It("returns an error", func() {
 			var err error = seq.SetKey("123")
-			cv.So(err, cv.ShouldNotBeEmpty)
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).NotTo(BeEmpty())
 		})
 	})
-}
 
-func TestSequencerSerialisation(t *testing.T) {
-	var buf bytes.Buffer
-	seq1 := &Sequencer{Index: 42}
-	seq2 := &Sequencer{}
+	Describe("serialisation", func() {
+		It("saves and loads to a buffer", func() {
+			seq.Index = 42000
+			seqCopy := &Sequencer{}
 
-	cv.Convey("Given a sequencer", t, func() {
-		cv.Convey("It should serialise to/from a buffer", func() {
-			seq1.Save(&buf)
-			seq2.Load(&buf)
-			cv.So(seq2.Index, cv.ShouldEqual, 42)
+			var buf bytes.Buffer
+			seq.Save(&buf)
+			seqCopy.Load(&buf)
+
+			Expect(seqCopy.Index).To(Equal(seq.Index))
 		})
 	})
-}
+
+})
