@@ -74,7 +74,7 @@ func (server *Server) set(cmd *Command) *Result {
 
 	var sId = cmd.Args["id"]
 	if sId == "" {
-		doc.K = server.db.Next()
+		doc.K = server.db.NextKey()
 		log.Println("no id provided, using", doc.K)
 	} else {
 		log.Println("id provided, using", sId)

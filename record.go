@@ -1,9 +1,7 @@
 package hare
 
 import (
-	"encoding/binary"
 	"io"
-	"strconv"
 )
 
 type Recorded interface {
@@ -20,7 +18,7 @@ type Recorded interface {
 }
 
 type Record struct {
-	K     uint64 `capid:"skip", json:"key"`
+	K     Key `capid:"skip", json:"key"`
 	saved bool
 }
 
@@ -29,15 +27,11 @@ func (record *Record) BucketName() string {
 }
 
 func (record *Record) Key() []byte {
-	bKey := make([]byte, 8)
-	binary.BigEndian.PutUint64(bKey, record.K)
-	return bKey
+	return record.K.Bytes()
 }
 
-func (record *Record) SetKey(key string) (err error) {
-	var k uint64
-
-	k, err = strconv.ParseUint(key, 10, 64)
+func (record *Record) SetKey(key string) error {
+	k, err := StringToKey(key)
 	if err != nil {
 		return err
 	}

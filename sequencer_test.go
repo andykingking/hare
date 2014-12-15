@@ -39,11 +39,11 @@ var _ = Describe("Sequencer", func() {
 		})
 	})
 
-	Describe("Next()", func() {
+	Describe("NextKey()", func() {
 		It("increments and returns Index", func() {
 			seq.Index = 8
-			n := seq.Next()
-			Expect(n).To(Equal(uint64(9)))
+			n := seq.NextKey()
+			Expect(n).To(Equal(NewKey(9)))
 			Expect(seq.Index).To(Equal(int64(9)))
 		})
 	})

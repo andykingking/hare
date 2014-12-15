@@ -116,7 +116,7 @@ func (db *DB) saveSequencer() (err error) {
 	return err
 }
 
-func (db *DB) Next() uint64 {
+func (db *DB) NextKey() Key {
 	// TODO write new sequence number to db
-	return db.Sequencer.Next()
+	return db.Sequencer.NextKey()
 }

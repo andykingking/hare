@@ -17,38 +17,27 @@ var _ = Describe("Record", func() {
 		record = &Record{}
 	})
 
+	Describe("Key()", func() {
+		It("is the keys bytes", func() {
+			key := NewKey(12345678)
+			record.K = key
+			Expect(record.Key()).To(Equal(key.Bytes()))
+		})
+	})
+
+	Describe("SetKey()", func() {
+		It("sets the key using a string", func() {
+			sKey := "12345678"
+			record.SetKey(sKey)
+			k, _ := StringToKey(sKey)
+			Expect(record.K).To(Equal(k))
+		})
+	})
+
 	Describe("BucketName()", func() {
 		It("should be 'hare' by default", func() {
 			Expect(record.BucketName()).To(Equal("hare"))
 		})
-	})
-
-	Context("K", func() {
-
-		var (
-			sk string
-			ik uint64
-			bk []byte
-		)
-
-		BeforeEach(func() {
-			sk, ik, bk = "12345678", 12345678, []byte{0, 0, 0, 0, 0, 188, 97, 78}
-		})
-
-		Describe("Key()", func() {
-			It("is the 8-byte, big-endian representation of the 64-bit unsigned integer internal key", func() {
-				record.K = ik
-				Expect(record.Key()).To(Equal(bk))
-			})
-		})
-
-		Describe("SetKey()", func() {
-			It("sets the internal key to the 64-bit unsigned integer represented numerically by the passed string", func() {
-				record.SetKey(sk)
-				Expect(record.K).To(Equal(ik))
-			})
-		})
-
 	})
 
 	Context("saved", func() {

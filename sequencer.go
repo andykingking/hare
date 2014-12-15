@@ -24,7 +24,7 @@ func (seq *Sequencer) SetKey(sId string) error {
 	return errors.New("Can't set key for sequence")
 }
 
-func (seq *Sequencer) Next() uint64 {
+func (seq *Sequencer) NextKey() Key {
 	seq.Index++
-	return uint64(seq.Index)
+	return Key{uint64(seq.Index)}
 }
