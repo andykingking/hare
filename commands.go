@@ -5,7 +5,8 @@ import (
 	"time"
 )
 
-func (server *Server) HandleCommand(cmd *Command) (res *Result) {
+func (server *Server) HandleCommand(cmd *Command) (res *Result, keepAlive bool) {
+	keepAlive = true
 	switch cmd.Name {
 	case "TIME":
 		res = server.time(cmd)
@@ -19,10 +20,18 @@ func (server *Server) HandleCommand(cmd *Command) (res *Result) {
 		res = server.vget(cmd)
 	case "VSET":
 		res = server.vset(cmd)
+	case "CLOSE":
+		res = server.close_connection(cmd)
+		keepAlive = false
 	default:
 		res = server.unknown()
 	}
-	return res
+	return res, keepAlive
+}
+
+// { "name": "CLOSE" }
+func (server *Server) close_connection(cmd *Command) *Result {
+	return &Result{Val: "CLOSED"}
 }
 
 // { "name": "TIME" }

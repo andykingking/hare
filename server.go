@@ -83,27 +83,34 @@ func (server *Server) handleConnection(conn *net.TCPConn) {
 	var err error
 	var cmd = &Command{}
 	var res = &Result{}
+	keepAlive := false
 	var jsonRes []byte
 	reader := bufio.NewReader(conn)
 	writer := bufio.NewWriter(conn)
 	jsonIn := json.NewDecoder(reader)
 
-	err = jsonIn.Decode(&cmd)
-	if err != nil {
-		res.Err = err.Error()
-	} else {
-		log.Println("<--", cmd)
-		res = server.HandleCommand(cmd)
+	for {
+		err = jsonIn.Decode(&cmd)
+		if err != nil {
+			res.Err = err.Error()
+		} else {
+			log.Println("<--", cmd)
+			res, keepAlive = server.HandleCommand(cmd)
+		}
+
+		jsonRes, err = json.Marshal(res)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		log.Println("-->", string(jsonRes))
+
+		writer.Write(jsonRes)
+		writer.Flush()
+
+		if !keepAlive {
+			return
+		}
 	}
-
-	jsonRes, err = json.Marshal(res)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	log.Println("-->", string(jsonRes))
-
-	writer.Write(jsonRes)
-	writer.Flush()
 }
