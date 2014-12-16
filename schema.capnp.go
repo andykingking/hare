@@ -33,6 +33,34 @@ func (s DocumentCapn_List) ToArray() []DocumentCapn {
 }
 func (s DocumentCapn_List) Set(i int, item DocumentCapn) { C.PointerList(s).Set(i, C.Object(item)) }
 
+type FactCapn C.Struct
+
+func NewFactCapn(s *C.Segment) FactCapn      { return FactCapn(s.NewStruct(24, 0)) }
+func NewRootFactCapn(s *C.Segment) FactCapn  { return FactCapn(s.NewRootStruct(24, 0)) }
+func AutoNewFactCapn(s *C.Segment) FactCapn  { return FactCapn(s.NewStructAR(24, 0)) }
+func ReadRootFactCapn(s *C.Segment) FactCapn { return FactCapn(s.Root(0).ToStruct()) }
+func (s FactCapn) KView() uint64             { return C.Struct(s).Get64(0) }
+func (s FactCapn) SetKView(v uint64)         { C.Struct(s).Set64(0, v) }
+func (s FactCapn) KDomain() uint64           { return C.Struct(s).Get64(8) }
+func (s FactCapn) SetKDomain(v uint64)       { C.Struct(s).Set64(8, v) }
+func (s FactCapn) KTarget() uint64           { return C.Struct(s).Get64(16) }
+func (s FactCapn) SetKTarget(v uint64)       { C.Struct(s).Set64(16, v) }
+
+// capn.JSON_enabled == false so we stub MarshallJSON().
+func (s FactCapn) MarshalJSON() (bs []byte, err error) { return }
+
+type FactCapn_List C.PointerList
+
+func NewFactCapnList(s *C.Segment, sz int) FactCapn_List {
+	return FactCapn_List(s.NewCompositeList(24, 0, sz))
+}
+func (s FactCapn_List) Len() int          { return C.PointerList(s).Len() }
+func (s FactCapn_List) At(i int) FactCapn { return FactCapn(C.PointerList(s).At(i).ToStruct()) }
+func (s FactCapn_List) ToArray() []FactCapn {
+	return *(*[]FactCapn)(unsafe.Pointer(C.PointerList(s).ToArray()))
+}
+func (s FactCapn_List) Set(i int, item FactCapn) { C.PointerList(s).Set(i, C.Object(item)) }
+
 type SequencerCapn C.Struct
 
 func NewSequencerCapn(s *C.Segment) SequencerCapn      { return SequencerCapn(s.NewStruct(8, 0)) }

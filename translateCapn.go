@@ -48,6 +48,49 @@ func DocumentGoToCapn(seg *capn.Segment, src *Document) DocumentCapn {
 
 
 
+func (s *Fact) Save(w io.Writer) {
+  	seg := capn.NewBuffer(nil)
+  	FactGoToCapn(seg, s)
+  	seg.WriteTo(w)
+}
+ 
+
+ 
+func (s *Fact) Load(r io.Reader) {
+  	capMsg, err := capn.ReadFromStream(r, nil)
+  	if err != nil {
+  		panic(fmt.Errorf("capn.ReadFromStream error: %s", err))
+  	}
+  	z := ReadRootFactCapn(capMsg)
+      FactCapnToGo(z, s)
+}
+
+
+
+func FactCapnToGo(src FactCapn, dest *Fact) *Fact { 
+  if dest == nil { 
+    dest = &Fact{} 
+  }
+  dest.KView = uint64(src.KView())
+  dest.KDomain = uint64(src.KDomain())
+  dest.KTarget = uint64(src.KTarget())
+
+  return dest
+} 
+
+
+
+func FactGoToCapn(seg *capn.Segment, src *Fact) FactCapn { 
+  dest := AutoNewFactCapn(seg)
+  dest.SetKView(uint64(src.KView))
+  dest.SetKDomain(uint64(src.KDomain))
+  dest.SetKTarget(uint64(src.KTarget))
+
+  return dest
+} 
+
+
+
 func (s *Sequencer) Save(w io.Writer) {
   	seg := capn.NewBuffer(nil)
   	SequencerGoToCapn(seg, s)
