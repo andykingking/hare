@@ -5,7 +5,7 @@ import (
 )
 
 type Recorded interface {
-	BucketName() string
+	BucketName() []byte
 
 	Key() []byte
 	SetKey(key string) error

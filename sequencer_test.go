@@ -21,7 +21,7 @@ var _ = Describe("Sequencer", func() {
 
 	Describe("BucketName()", func() {
 		It("should be 'seq'", func() {
-			Expect(seq.BucketName()).To(Equal("seq"))
+			Expect(seq.BucketName()).To(Equal([]byte("sequencers")))
 		})
 	})
 

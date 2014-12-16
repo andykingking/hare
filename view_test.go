@@ -19,7 +19,7 @@ var _ = Describe("View", func() {
 
 	Describe("BucketName()", func() {
 		It("should be 'views' by default", func() {
-			Expect(view.BucketName()).To(Equal("views"))
+			Expect(view.BucketName()).To(Equal([]byte("views")))
 		})
 	})
 

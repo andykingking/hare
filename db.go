@@ -37,7 +37,7 @@ func (db *DB) Load(obj Recorded) (err error) {
 	bKey := obj.Key()
 	err = db.bolt.Update(func(tx *bolt.Tx) error {
 		bucketName := obj.BucketName()
-		bucket, err := tx.CreateBucketIfNotExists([]byte(bucketName))
+		bucket, err := tx.CreateBucketIfNotExists(bucketName)
 		if err != nil {
 			return err
 		}
@@ -58,7 +58,7 @@ func (db *DB) Save(obj Recorded) (err error) {
 	bKey := obj.Key()
 	err = db.bolt.Update(func(tx *bolt.Tx) error {
 		bucketName := obj.BucketName()
-		bucket, err := tx.CreateBucketIfNotExists([]byte(bucketName))
+		bucket, err := tx.CreateBucketIfNotExists(bucketName)
 		if err != nil {
 			return err
 		}
@@ -82,7 +82,7 @@ func (db *DB) Delete(obj Recorded) (err error) {
 	bKey := obj.Key()
 	err = db.bolt.Update(func(tx *bolt.Tx) error {
 		bucketName := obj.BucketName()
-		bucket, err := tx.CreateBucketIfNotExists([]byte(bucketName))
+		bucket, err := tx.CreateBucketIfNotExists(bucketName)
 		if err != nil {
 			return err
 		}

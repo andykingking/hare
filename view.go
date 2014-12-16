@@ -15,8 +15,8 @@ func (view *View) Value() string {
 	return ""
 }
 
-func (view *View) BucketName() string {
-	return "views"
+func (view *View) BucketName() []byte {
+	return []byte("views")
 }
 
 // vm := otto.New()

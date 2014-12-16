@@ -9,8 +9,8 @@ type Sequencer struct {
 	Mark   uint64 `capid:"0"`
 }
 
-func (seq *Sequencer) BucketName() string {
-	return "seq"
+func (seq *Sequencer) BucketName() []byte {
+	return []byte("sequencers")
 }
 
 func (seq *Sequencer) Key() []byte {

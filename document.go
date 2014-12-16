@@ -21,6 +21,6 @@ func (doc *Document) SetBody(body string) (err error) {
 	return nil
 }
 
-func (doc *Document) BucketName() string {
-	return "doc"
+func (doc *Document) BucketName() []byte {
+	return []byte("data")
 }
